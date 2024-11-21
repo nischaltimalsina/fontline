@@ -46,53 +46,31 @@ module.exports = __toCommonJS(src_exports);
 var import_react = __toESM(require("react"));
 var FontContext = (0, import_react.createContext)(void 0);
 function FontProvider({ children, config }) {
-  const [currentFont, setCurrentFont] = (0, import_react.useState)(config.defaultFont || Object.keys(config.fonts)[0]);
-  const [fonts, setFonts] = (0, import_react.useState)({});
-  const [mounted, setMounted] = (0, import_react.useState)(false);
+  const [currentFont, setCurrentFont] = (0, import_react.useState)(
+    config.defaultFont || Object.keys(config.fonts)[0]
+  );
   (0, import_react.useEffect)(() => {
-    const loadFonts = async () => {
-      const loadedFonts = {};
-      for (const [name, definition] of Object.entries(config.fonts)) {
-        const fontInstance = await definition.font(definition.options);
-        loadedFonts[name] = fontInstance;
-      }
-      setFonts(loadedFonts);
-      setMounted(true);
-    };
-    loadFonts();
+    const savedFont = localStorage.getItem("font");
+    if (savedFont && savedFont in config.fonts) {
+      setCurrentFont(savedFont);
+    }
   }, [config.fonts]);
   (0, import_react.useEffect)(() => {
-    if (mounted) {
-      const savedFont = localStorage.getItem("font");
-      if (savedFont && savedFont in fonts) {
-        setCurrentFont(savedFont);
-      }
-    }
-  }, [mounted, fonts]);
-  (0, import_react.useEffect)(() => {
-    if (mounted && fonts[currentFont]) {
-      document.documentElement.style.setProperty(
-        "--font-primary",
-        fonts[currentFont].style.fontFamily
-      );
-      localStorage.setItem("font", currentFont);
-    }
-  }, [currentFont, mounted, fonts]);
+    document.documentElement.style.setProperty(
+      "--font-primary",
+      config.fonts[currentFont].font.style.fontFamily
+    );
+    localStorage.setItem("font", currentFont);
+  }, [currentFont, config.fonts]);
   const getFontClassName = () => {
-    return Object.values(fonts).map((font) => font.className).join(" ");
+    return Object.values(config.fonts).map((fontData) => fontData.font.className).join(" ");
   };
-  return /* @__PURE__ */ import_react.default.createElement(
-    FontContext.Provider,
-    {
-      value: {
-        currentFont,
-        setFont: setCurrentFont,
-        fonts,
-        getFontClassName
-      }
-    },
-    children
-  );
+  return /* @__PURE__ */ import_react.default.createElement(FontContext.Provider, { value: {
+    currentFont,
+    setFont: setCurrentFont,
+    fonts: config.fonts,
+    getFontClassName
+  } }, children);
 }
 var useFont = () => {
   const context = (0, import_react.useContext)(FontContext);
