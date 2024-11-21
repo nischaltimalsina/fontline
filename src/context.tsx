@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import type { FontConfig, FontContextType, FontManagerConfig } from './types'
+import type { FontManagerConfig, LoadedFont } from './types'
 
-const FontContext = createContext<FontContextType | undefined>(undefined)
+const FontContext = createContext<{
+  currentFont: string;
+  setFont: (font: string) => void;
+  fonts: Record<string, LoadedFont>;
+  getFontClassName: () => string;
+} | undefined>(undefined)
 
 export interface FontProviderProps {
   children: React.ReactNode;
@@ -9,60 +14,38 @@ export interface FontProviderProps {
 }
 
 export function FontProvider({ children, config }: FontProviderProps) {
-  const [currentFont, setCurrentFont] = useState<string>(config.defaultFont || Object.keys(config.fonts)[0])
-  const [fonts, setFonts] = useState<Record<string, FontConfig>>({})
-  const [mounted, setMounted] = useState(false)
+  const [currentFont, setCurrentFont] = useState<string>(
+    config.defaultFont || Object.keys(config.fonts)[0]
+  )
 
   useEffect(() => {
-    const loadFonts = async () => {
-      const loadedFonts: Record<string, FontConfig> = {}
-
-      for (const [name, definition] of Object.entries(config.fonts)) {
-        const fontInstance = await definition.font(definition.options)
-        loadedFonts[name] = fontInstance as FontConfig
-      }
-
-      setFonts(loadedFonts)
-      setMounted(true)
+    const savedFont = localStorage.getItem('font')
+    if (savedFont && savedFont in config.fonts) {
+      setCurrentFont(savedFont)
     }
-
-    loadFonts()
   }, [config.fonts])
 
   useEffect(() => {
-    if (mounted) {
-      const savedFont = localStorage.getItem('font')
-      if (savedFont && savedFont in fonts) {
-        setCurrentFont(savedFont)
-      }
-    }
-  }, [mounted, fonts])
-
-  useEffect(() => {
-    if (mounted && fonts[currentFont]) {
-      document.documentElement.style.setProperty(
-        '--font-primary',
-        fonts[currentFont].style.fontFamily
-      )
-      localStorage.setItem('font', currentFont)
-    }
-  }, [currentFont, mounted, fonts])
+    document.documentElement.style.setProperty(
+      '--font-primary',
+      config.fonts[currentFont].font.style.fontFamily
+    )
+    localStorage.setItem('font', currentFont)
+  }, [currentFont, config.fonts])
 
   const getFontClassName = () => {
-    return Object.values(fonts)
-      .map((font) => font.className)
+    return Object.values(config.fonts)
+      .map((fontData) => fontData.font.className)
       .join(' ')
   }
 
   return (
-    <FontContext.Provider
-      value={{
-        currentFont,
-        setFont: setCurrentFont,
-        fonts,
-        getFontClassName
-      }}
-    >
+    <FontContext.Provider value={{
+      currentFont,
+      setFont: setCurrentFont,
+      fonts: config.fonts,
+      getFontClassName,
+    }}>
       {children}
     </FontContext.Provider>
   )

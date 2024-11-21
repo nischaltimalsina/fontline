@@ -16,14 +16,19 @@ export type FontDefinition = {
   options: FontOptions;
 }
 
-export type FontManagerConfig = {
-  fonts: Record<string, FontDefinition>;
-  defaultFont?: string;
-}
-
 export type FontContextType = {
   currentFont: string;
   setFont: (font: string) => void;
   fonts: Record<string, FontConfig>;
   getFontClassName: () => string;
+}
+
+export type LoadedFont = {
+  font: FontConfig;
+  options: FontOptions;
+}
+
+export type FontManagerConfig = {
+  fonts: Record<string, LoadedFont>;
+  defaultFont?: string;
 }
