@@ -1,0 +1,12 @@
+node_modules/
+src/
+examples/
+.github/
+coverage/
+.DS_Store
+*.log
+tsup.config.ts
+.eslintrc
+.prettierrc
+*.test.ts
+*.test.tsx
