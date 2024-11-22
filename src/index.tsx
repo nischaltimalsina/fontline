@@ -162,3 +162,6 @@ export const FontProvider = (props: FontProviderProps) => {
   if (context) return <>{props.children}</>
   return <Font {...props} />
 }
+
+// Re-export types
+export type { FontConfig, FontProviderProps, UseFontProps, FontValues } from './types'
