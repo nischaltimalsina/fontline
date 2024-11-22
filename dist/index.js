@@ -31,11 +31,6 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   FontProvider: () => FontProvider,
-  Inter: () => import_google.Inter,
-  JetBrains_Mono: () => import_google.JetBrains_Mono,
-  Lora: () => import_google.Lora,
-  Poppins: () => import_google.Poppins,
-  Roboto: () => import_google.Roboto,
   createFontManager: () => createFontManager,
   generateCssVariables: () => generateCssVariables,
   useFont: () => useFont
@@ -43,19 +38,19 @@ __export(src_exports, {
 module.exports = __toCommonJS(src_exports);
 
 // src/context.tsx
-var import_react = __toESM(require("react"));
-var FontContext = (0, import_react.createContext)(void 0);
+var React = __toESM(require("react"));
+var FontContext = React.createContext(void 0);
 function FontProvider({ children, config }) {
-  const [currentFont, setCurrentFont] = (0, import_react.useState)(
+  const [currentFont, setCurrentFont] = React.useState(
     config.defaultFont || Object.keys(config.fonts)[0]
   );
-  (0, import_react.useEffect)(() => {
+  React.useEffect(() => {
     const savedFont = localStorage.getItem("font");
     if (savedFont && savedFont in config.fonts) {
       setCurrentFont(savedFont);
     }
   }, [config.fonts]);
-  (0, import_react.useEffect)(() => {
+  React.useEffect(() => {
     document.documentElement.style.setProperty(
       "--font-primary",
       config.fonts[currentFont].font.style.fontFamily
@@ -65,7 +60,7 @@ function FontProvider({ children, config }) {
   const getFontClassName = () => {
     return Object.values(config.fonts).map((fontData) => fontData.font.className).join(" ");
   };
-  return /* @__PURE__ */ import_react.default.createElement(FontContext.Provider, { value: {
+  return /* @__PURE__ */ React.createElement(FontContext.Provider, { value: {
     currentFont,
     setFont: setCurrentFont,
     fonts: config.fonts,
@@ -73,7 +68,7 @@ function FontProvider({ children, config }) {
   } }, children);
 }
 var useFont = () => {
-  const context = (0, import_react.useContext)(FontContext);
+  const context = React.useContext(FontContext);
   if (!context) {
     throw new Error("useFont must be used within a FontProvider");
   }
@@ -94,17 +89,9 @@ var createFontManager = (config) => {
     getFontList: () => Object.keys(config.fonts)
   };
 };
-
-// src/index.ts
-var import_google = require("next/font/google");
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   FontProvider,
-  Inter,
-  JetBrains_Mono,
-  Lora,
-  Poppins,
-  Roboto,
   createFontManager,
   generateCssVariables,
   useFont

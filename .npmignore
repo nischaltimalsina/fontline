@@ -1,12 +1,32 @@
-node_modules/
+# Source
 src/
+tests/
 examples/
+
+# Config files
 .github/
-coverage/
-.DS_Store
-*.log
-tsup.config.ts
+.gitignore
 .eslintrc
 .prettierrc
-*.test.ts
-*.test.tsx
+tsconfig.json
+jest.config.js
+*.config.ts
+
+# Development
+coverage/
+node_modules/
+.env*
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

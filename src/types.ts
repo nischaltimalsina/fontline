@@ -1,34 +1,34 @@
-import type { NextFont } from 'next/dist/compiled/@next/font'
+import * as React from 'react'
 
-export type FontConfig = NextFont & {
-  variable: string;
+export type FontConfig = {
+  className: string;
+  style: {
+    fontFamily: string;
+  };
 }
 
-export type FontOptions = {
-  subsets?: string[];
-  weight?: string[] | number[];
-  display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
-  variable?: string;
+export interface FontValueObject {
+  [fontName: string]: string;
 }
 
-export type FontDefinition = {
-  font: (...args: any[]) => Promise<NextFont> | NextFont;
-  options: FontOptions;
+export interface FontValues {
+  [key: string]: string;
 }
 
-export type FontContextType = {
-  currentFont: string;
-  setFont: (font: string) => void;
+export interface UseFontProps {
+  fonts: string[];
+  forcedFont?: string;
+  setFont: React.Dispatch<React.SetStateAction<string>>;
+  font: string;
+  resolvedFont: string;
+}
+
+export interface FontProviderProps extends React.PropsWithChildren {
   fonts: Record<string, FontConfig>;
-  getFontClassName: () => string;
-}
-
-export type LoadedFont = {
-  font: FontConfig;
-  options: FontOptions;
-}
-
-export type FontManagerConfig = {
-  fonts: Record<string, LoadedFont>;
-  defaultFont?: string;
+  forcedFont?: string;
+  defaultFont: string;
+  storageKey?: string;
+  disableTransitionOnChange?: boolean;
+  values?: FontValues;
+  nonce?: string;
 }

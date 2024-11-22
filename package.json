@@ -1,6 +1,6 @@
 {
   "name": "next-font-manager",
-  "version": "0.1.2",
+  "version": "0.1.6",
   "description": "Font management system for Next.js applications",
   "author": "Your Name",
   "license": "MIT",
@@ -40,9 +40,9 @@
     "prepublishOnly": "pnpm run build",
     "test": "jest",
     "prepare": "husky install",
-    "version:patch": "node scripts/version.js patch",
-    "version:minor": "node scripts/version.js minor",
-    "version:major": "node scripts/version.js major"
+    "release:major": "tsx scripts/release.ts major",
+    "release:minor": "tsx scripts/release.ts minor",
+    "release:patch": "tsx scripts/release.ts patch"
   },
   "peerDependencies": {
     "next": ">=13.0.0",

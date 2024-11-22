@@ -1,17 +1,17 @@
 // src/context.tsx
-import React, { createContext, useContext, useEffect, useState } from "react";
-var FontContext = createContext(void 0);
+import * as React from "react";
+var FontContext = React.createContext(void 0);
 function FontProvider({ children, config }) {
-  const [currentFont, setCurrentFont] = useState(
+  const [currentFont, setCurrentFont] = React.useState(
     config.defaultFont || Object.keys(config.fonts)[0]
   );
-  useEffect(() => {
+  React.useEffect(() => {
     const savedFont = localStorage.getItem("font");
     if (savedFont && savedFont in config.fonts) {
       setCurrentFont(savedFont);
     }
   }, [config.fonts]);
-  useEffect(() => {
+  React.useEffect(() => {
     document.documentElement.style.setProperty(
       "--font-primary",
       config.fonts[currentFont].font.style.fontFamily
@@ -29,7 +29,7 @@ function FontProvider({ children, config }) {
   } }, children);
 }
 var useFont = () => {
-  const context = useContext(FontContext);
+  const context = React.useContext(FontContext);
   if (!context) {
     throw new Error("useFont must be used within a FontProvider");
   }
@@ -50,16 +50,8 @@ var createFontManager = (config) => {
     getFontList: () => Object.keys(config.fonts)
   };
 };
-
-// src/index.ts
-import { Inter, Roboto, Lora, Poppins, JetBrains_Mono } from "next/font/google";
 export {
   FontProvider,
-  Inter,
-  JetBrains_Mono,
-  Lora,
-  Poppins,
-  Roboto,
   createFontManager,
   generateCssVariables,
   useFont

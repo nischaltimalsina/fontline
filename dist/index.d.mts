@@ -1,6 +1,5 @@
 import { NextFont } from 'next/dist/compiled/@next/font';
-import React from 'react';
-export { Inter, JetBrains_Mono, Lora, Poppins, Roboto } from 'next/font/google';
+import * as React from 'react';
 
 type FontConfig = NextFont & {
     variable: string;
