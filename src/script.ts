@@ -1,3 +1,5 @@
+"use client"
+
 import { FontConfig, FontValueObject } from "./types"
 
 export const script = (
