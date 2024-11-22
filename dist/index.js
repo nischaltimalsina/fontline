@@ -31,12 +31,74 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var src_exports = {};
 __export(src_exports, {
   FontProvider: () => FontProvider,
+  getFontScript: () => getFontScript,
+  script: () => script,
   useFont: () => useFont
 });
 module.exports = __toCommonJS(src_exports);
 
 // src/context.tsx
 var React = __toESM(require("react"));
+
+// src/script.ts
+var script = (storageKey, defaultFont, forcedFont, fonts, value) => {
+  const el = document.documentElement;
+  function updateDOM(font) {
+    const fontConfig = fonts[font];
+    if (!fontConfig) return;
+    Object.keys(fonts).forEach((name) => {
+      const className2 = (value == null ? void 0 : value[name]) || fonts[name].className;
+      el.classList.remove(className2);
+    });
+    const className = (value == null ? void 0 : value[font]) || fontConfig.className;
+    el.classList.add(className);
+    el.style.setProperty("--font-primary", fontConfig.style.fontFamily);
+  }
+  if (forcedFont) {
+    updateDOM(forcedFont);
+  } else {
+    try {
+      const fontName = localStorage.getItem(storageKey) || defaultFont;
+      updateDOM(fontName);
+    } catch (e) {
+    }
+  }
+};
+var getFontScript = () => `
+function(config) {
+  const el = document.documentElement;
+
+  function updateDOM(fontName) {
+    if (!fontName || !config.fonts[fontName]) return;
+
+    // Remove previous font classes
+    Object.keys(config.fonts).forEach(name => {
+      const className = config.values?.[name] || config.fonts[name].className;
+      el.classList.remove(className);
+    });
+
+    // Add new font class
+    const className = config.values?.[fontName] || config.fonts[fontName].className;
+    el.classList.add(className);
+
+    // Update CSS custom property
+    el.style.setProperty('--font-primary', config.fonts[fontName].style.fontFamily);
+  }
+
+  if (config.forcedFont) {
+    updateDOM(config.forcedFont);
+  } else {
+    try {
+      const fontName = localStorage.getItem(config.storageKey) || config.defaultFont;
+      updateDOM(fontName);
+    } catch (e) {
+      updateDOM(config.defaultFont);
+    }
+  }
+}
+`;
+
+// src/context.tsx
 var FontContext = React.createContext(void 0);
 var getInitialFont = (storageKey, defaultFont) => {
   if (typeof window === "undefined") return defaultFont;
@@ -146,39 +208,6 @@ var FontScript = React.memo(({
     }
   );
 });
-var getFontScript = () => `
-function(config) {
-  const el = document.documentElement;
-
-  function updateDOM(fontName) {
-    if (!fontName || !config.fonts[fontName]) return;
-
-    // Remove previous font classes
-    Object.keys(config.fonts).forEach(name => {
-      const className = config.values?.[name] || config.fonts[name].className;
-      el.classList.remove(className);
-    });
-
-    // Add new font class
-    const className = config.values?.[fontName] || config.fonts[fontName].className;
-    el.classList.add(className);
-
-    // Update CSS custom property
-    el.style.setProperty('--font-primary', config.fonts[fontName].style.fontFamily);
-  }
-
-  if (config.forcedFont) {
-    updateDOM(config.forcedFont);
-  } else {
-    try {
-      const fontName = localStorage.getItem(config.storageKey) || config.defaultFont;
-      updateDOM(fontName);
-    } catch (e) {
-      updateDOM(config.defaultFont);
-    }
-  }
-}
-`;
 var disableAnimation = (nonce) => {
   const css = document.createElement("style");
   if (nonce) css.setAttribute("nonce", nonce);
@@ -203,6 +232,8 @@ var FontProvider = (props) => {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   FontProvider,
+  getFontScript,
+  script,
   useFont
 });
 //# sourceMappingURL=index.js.map

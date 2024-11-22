@@ -32,4 +32,7 @@ interface FontProviderProps extends React.PropsWithChildren {
 declare const useFont: () => UseFontProps;
 declare const FontProvider: (props: FontProviderProps) => React.JSX.Element;
 
-export { type FontConfig, FontProvider, type FontProviderProps, type FontValueObject, type FontValues, type UseFontProps, useFont };
+declare const script: (storageKey: string, defaultFont: string, forcedFont: string | undefined, fonts: Record<string, FontConfig>, value: FontValueObject | undefined) => void;
+declare const getFontScript: () => string;
+
+export { type FontConfig, FontProvider, type FontProviderProps, type FontValueObject, type FontValues, type UseFontProps, getFontScript, script, useFont };
