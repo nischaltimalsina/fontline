@@ -1,6 +1,6 @@
 {
   "name": "next-font-manager",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Font management system for Next.js applications",
   "author": "Nischal Timalsina",
   "license": "MIT",
