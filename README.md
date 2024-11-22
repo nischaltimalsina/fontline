@@ -1,6 +1,9 @@
 # next-font-manager
 
-A powerful and flexible font management system for Next.js applications with TypeScript support.
+A powerful and flexible font management system for Next.js applications.
+
+[![npm version](https://badge.fury.io/js/next-font-manager.svg)](https://badge.fury.io/js/next-font-manager)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
 
@@ -10,8 +13,8 @@ A powerful and flexible font management system for Next.js applications with Typ
 - 🎨 CSS variables integration
 - ⚛️ React hooks for font management
 - 📦 Zero-config integration with Next.js
-- 🔍 Optimized font loading strategies
-- 🌐 Support for Google Fonts and local fonts
+- 🌓 Smooth font transitions
+- 🔍 SSR support
 
 ## Installation
 
@@ -19,51 +22,59 @@ A powerful and flexible font management system for Next.js applications with Typ
 # npm
 npm install next-font-manager
 
-# yarn
-yarn add next-font-manager
-
 # pnpm
 pnpm add next-font-manager
+
+# yarn
+yarn add next-font-manager
 ```
 
 ## Quick Start
 
-1. Configure your fonts:
+1. Load your fonts using Next.js font loaders:
 
 ```typescript
-// app/font-config.ts
-import { FontManagerConfig, Inter, Roboto } from 'next-font-manager'
+// app/fonts.ts
+import { Inter, Roboto } from 'next/font/google'
+import type { FontProviderProps } from 'next-font-manager'
 
-export const fontConfig: FontManagerConfig = {
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+})
+
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+  variable: '--font-roboto',
+})
+
+export const fontConfig: FontProviderProps = {
   fonts: {
     inter: {
-      font: Inter,
-      options: {
-        subsets: ['latin'],
-        variable: '--font-inter',
-        display: 'swap',
-      },
+      className: inter.className,
+      style: { fontFamily: inter.style.fontFamily }
     },
     roboto: {
-      font: Roboto,
-      options: {
-        subsets: ['latin'],
-        weight: ['400', '500', '700'],
-        variable: '--font-roboto',
-        display: 'swap',
-      },
-    },
+      className: roboto.className,
+      style: { fontFamily: roboto.style.fontFamily }
+    }
   },
   defaultFont: 'inter',
+  // Optional: Custom class mappings
+  values: {
+    inter: 'my-custom-inter',
+    roboto: 'my-custom-roboto'
+  },
 }
 ```
 
-2. Set up the provider:
+2. Set up the provider in your layout:
 
 ```typescript
 // app/layout.tsx
 import { FontProvider } from 'next-font-manager'
-import { fontConfig } from './font-config'
+import { fontConfig } from './fonts'
 
 export default function RootLayout({
   children,
@@ -73,7 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <FontProvider config={fontConfig}>
+        <FontProvider {...fontConfig}>
           {children}
         </FontProvider>
       </body>
@@ -82,20 +93,21 @@ export default function RootLayout({
 }
 ```
 
-3. Use the font manager in your components:
+3. Use the hook in your components:
 
 ```typescript
+// components/font-selector.tsx
 import { useFont } from 'next-font-manager'
 
 export function FontSelector() {
-  const { currentFont, setFont, fonts } = useFont()
+  const { font, setFont, fonts } = useFont()
 
   return (
     <select
-      value={currentFont}
+      value={font}
       onChange={(e) => setFont(e.target.value)}
     >
-      {Object.keys(fonts).map((fontName) => (
+      {fonts.map((fontName) => (
         <option key={fontName} value={fontName}>
           {fontName}
         </option>
@@ -107,228 +119,100 @@ export function FontSelector() {
 
 ## API Reference
 
-### `FontProvider`
+### FontProvider
 
-The main provider component that manages font state.
+The main provider component for font management.
 
 ```typescript
 interface FontProviderProps {
-  children: React.ReactNode;
-  config: FontManagerConfig;
-}
-```
-
-### `useFont` Hook
-
-A hook that provides access to font management functions.
-
-```typescript
-interface FontContextType {
-  currentFont: string;
-  setFont: (font: string) => void;
   fonts: Record<string, FontConfig>;
-  getFontClassName: () => string;
+  defaultFont: string;
+  forcedFont?: string;
+  storageKey?: string;
+  disableTransitionOnChange?: boolean;
+  values?: FontValues;
+  nonce?: string;
 }
-
-const { currentFont, setFont, fonts, getFontClassName } = useFont()
 ```
 
-### Configuration Types
+### useFont Hook
+
+Hook for accessing font state and controls.
 
 ```typescript
-type FontManagerConfig = {
-  fonts: Record<string, FontDefinition>;
-  defaultFont?: string;
+interface UseFontProps {
+  font: string;
+  setFont: React.Dispatch<React.SetStateAction<string>>;
+  fonts: string[];
+  forcedFont?: string;
+  resolvedFont: string;
 }
 
-type FontDefinition = {
-  font: (...args: any[]) => Promise<NextFont> | NextFont;
-  options: FontOptions;
-}
-
-type FontOptions = {
-  subsets?: string[];
-  weight?: string[] | number[];
-  display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
-  variable?: string;
-}
+const { font, setFont, fonts, resolvedFont } = useFont()
 ```
+
+## Configuration Options
+
+- `fonts`: Record of available fonts with their configurations
+- `defaultFont`: Initial font to use
+- `forcedFont`: Override user selection (optional)
+- `storageKey`: LocalStorage key for persistence (default: 'font')
+- `disableTransitionOnChange`: Disable transitions when changing fonts
+- `values`: Custom class name mappings
+- `nonce`: CSP nonce for inline scripts
 
 ## Advanced Usage
 
-### Custom Font Loading
+### Custom Font Classes
 
 ```typescript
-import localFont from 'next/font/local'
-
-const customFont = localFont({
-  src: './path/to/font.woff2',
-  variable: '--font-custom',
-})
-
-const fontConfig: FontManagerConfig = {
-  fonts: {
-    custom: {
-      font: () => customFont,
-      options: {
-        variable: '--font-custom',
-      },
-    },
-  },
-}
-```
-
-### Font Loading Optimization
-
-```typescript
-const fontConfig: FontManagerConfig = {
+const fontConfig: FontProviderProps = {
   fonts: {
     inter: {
-      font: Inter,
-      options: {
-        subsets: ['latin'],
-        variable: '--font-inter',
-        display: 'swap',
-        preload: true,
-        fallback: ['system-ui', 'arial'],
-      },
-    },
+      className: 'font-inter',
+      style: { fontFamily: 'Inter' }
+    }
   },
+  values: {
+    inter: 'my-custom-class'
+  }
 }
 ```
 
-### CSS Integration
-
-```css
-/* globals.css */
-:root {
-  --font-primary: var(--font-inter);
-}
-
-body {
-  font-family: var(--font-primary);
-}
-
-/* Create utility classes */
-.font-inter {
-  font-family: var(--font-inter);
-}
-
-.font-roboto {
-  font-family: var(--font-roboto);
-}
-```
-
-## Examples
-
-### Basic Font Switcher
+### Forced Font
 
 ```typescript
-import { useFont } from 'next-font-manager'
-
-export function FontSwitcher() {
-  const { currentFont, setFont, fonts } = useFont()
-
-  return (
-    <div className="font-switcher">
-      <label htmlFor="font-select">Select Font:</label>
-      <select
-        id="font-select"
-        value={currentFont}
-        onChange={(e) => setFont(e.target.value)}
-      >
-        {Object.keys(fonts).map((fontName) => (
-          <option key={fontName} value={fontName}>
-            {fontName}
-          </option>
-        ))}
-      </select>
-
-      <div className={`preview font-${currentFont}`}>
-        <p>The quick brown fox jumps over the lazy dog</p>
-      </div>
-    </div>
-  )
-}
+<FontProvider
+  {...fontConfig}
+  forcedFont="inter"
+>
+  {children}
+</FontProvider>
 ```
 
-### Font Preview Component
+### Disable Transitions
 
 ```typescript
-import { useFont } from 'next-font-manager'
-
-export function FontPreview() {
-  const { currentFont } = useFont()
-
-  return (
-    <div className={`font-preview font-${currentFont}`}>
-      <h3>Font Preview: {currentFont}</h3>
-      <div className="preview-content">
-        <p className="text-lg">
-          The quick brown fox jumps over the lazy dog
-        </p>
-        <p className="text-sm">
-          ABCDEFGHIJKLMNOPQRSTUVWXYZ
-          abcdefghijklmnopqrstuvwxyz
-          1234567890!@#$%^&*()
-        </p>
-      </div>
-    </div>
-  )
-}
+<FontProvider
+  {...fontConfig}
+  disableTransitionOnChange
+>
+  {children}
+</FontProvider>
 ```
 
-### Integration with UI Libraries
+## Browser Support
 
-```typescript
-import { useFont } from 'next-font-manager'
-import { Select } from '@your-ui-library'
-
-export function FontSelector() {
-  const { currentFont, setFont, fonts } = useFont()
-
-  return (
-    <Select
-      label="System Font"
-      value={currentFont}
-      onValueChange={setFont}
-    >
-      {Object.keys(fonts).map((fontName) => (
-        <Select.Option key={fontName} value={fontName}>
-          {fontName}
-        </Select.Option>
-      ))}
-    </Select>
-  )
-}
-```
-
-## Best Practices
-
-1. **Font Loading**
-   - Use `display: 'swap'` for text visibility during font loading
-   - Include appropriate fallback fonts
-   - Preload critical fonts
-
-2. **Performance**
-   - Limit the number of font weights and styles
-   - Use subset optimization for large font families
-   - Implement proper font loading strategies
-
-3. **Accessibility**
-   - Ensure proper font fallbacks
-   - Maintain readable font sizes
-   - Consider user preferences
-
-4. **Maintainability**
-   - Keep font configurations in a separate file
-   - Use consistent naming conventions
-   - Document custom fonts and usage
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+- IE 11 (basic support)
 
 ## Contributing
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ## License
 
-MIT © [Your Name]
+[MIT](LICENSE.md)

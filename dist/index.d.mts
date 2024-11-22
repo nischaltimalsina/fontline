@@ -1,51 +1,35 @@
-import { NextFont } from 'next/dist/compiled/@next/font';
 import * as React from 'react';
 
-type FontConfig = NextFont & {
-    variable: string;
+type FontConfig = {
+    className: string;
+    style: {
+        fontFamily: string;
+    };
 };
-type FontOptions = {
-    subsets?: string[];
-    weight?: string[] | number[];
-    display?: 'auto' | 'block' | 'swap' | 'fallback' | 'optional';
-    variable?: string;
-};
-type FontDefinition = {
-    font: (...args: any[]) => Promise<NextFont> | NextFont;
-    options: FontOptions;
-};
-type FontContextType = {
-    currentFont: string;
-    setFont: (font: string) => void;
-    fonts: Record<string, FontConfig>;
-    getFontClassName: () => string;
-};
-type LoadedFont = {
-    font: FontConfig;
-    options: FontOptions;
-};
-type FontManagerConfig = {
-    fonts: Record<string, LoadedFont>;
-    defaultFont?: string;
-};
-
-interface FontProviderProps {
-    children: React.ReactNode;
-    config: FontManagerConfig;
+interface FontValueObject {
+    [fontName: string]: string;
 }
-declare function FontProvider({ children, config }: FontProviderProps): React.JSX.Element;
-declare const useFont: () => {
-    currentFont: string;
-    setFont: (font: string) => void;
-    fonts: Record<string, LoadedFont>;
-    getFontClassName: () => string;
-};
+interface FontValues {
+    [key: string]: string;
+}
+interface UseFontProps {
+    fonts: string[];
+    forcedFont?: string;
+    setFont: React.Dispatch<React.SetStateAction<string>>;
+    font: string;
+    resolvedFont: string;
+}
+interface FontProviderProps extends React.PropsWithChildren {
+    fonts: Record<string, FontConfig>;
+    forcedFont?: string;
+    defaultFont: string;
+    storageKey?: string;
+    disableTransitionOnChange?: boolean;
+    values?: FontValues;
+    nonce?: string;
+}
 
-declare const generateCssVariables: (fonts: Record<string, FontConfig>) => Record<string, string>;
-declare const createFontManager: (config: FontManagerConfig) => {
-    config: FontManagerConfig;
-    getDefaultFont: () => string;
-    getFontList: () => string[];
-};
+declare const useFont: () => UseFontProps;
+declare const FontProvider: (props: FontProviderProps) => React.JSX.Element;
 
-export { type FontConfig, type FontContextType, type FontDefinition, type FontManagerConfig, type FontOptions, FontProvider, type FontProviderProps, type LoadedFont, createFontManager, generateCssVariables, useFont };
+export { type FontConfig, FontProvider, type FontProviderProps, type FontValueObject, type FontValues, type UseFontProps, useFont };
