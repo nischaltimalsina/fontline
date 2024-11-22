@@ -1,2 +1,3 @@
-export * from './types'
-export * from './context'
+export * from './context';
+export * from './script';
+export * from './types';
