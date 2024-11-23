@@ -1,12 +1,12 @@
 {
-  "name": "next-fonts",
+  "name": "fontline",
   "version": "1.0.0",
   "description": "Font management system for Next.js applications",
   "author": "Nischal Timalsina",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/nischaltimalsina/next-font-manager"
+    "url": "https://github.com/nischaltimalsina/fontline"
   },
   "keywords": [
     "next",
