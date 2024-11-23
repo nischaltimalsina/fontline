@@ -1,8 +1,8 @@
-# next-font-manager
+# fontline
 
 A powerful and flexible font management system for Next.js applications.
 
-[![npm version](https://badge.fury.io/js/next-font-manager.svg)](https://badge.fury.io/js/next-font-manager)
+[![npm version](https://badge.fury.io/js/fontline.svg)](https://badge.fury.io/js/fontline)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -20,13 +20,13 @@ A powerful and flexible font management system for Next.js applications.
 
 ```bash
 # npm
-npm install next-font-manager
+npm install fontline
 
 # pnpm
-pnpm add next-font-manager
+pnpm add fontline
 
 # yarn
-yarn add next-font-manager
+yarn add fontline
 ```
 
 ## Quick Start
@@ -36,7 +36,7 @@ yarn add next-font-manager
 ```typescript
 // app/fonts.ts
 import { Inter, Roboto } from 'next/font/google'
-import type { FontProviderProps } from 'next-font-manager'
+import type { FontProviderProps } from 'fontline'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -73,7 +73,7 @@ export const fontConfig: FontProviderProps = {
 
 ```typescript
 // app/layout.tsx
-import { FontProvider } from 'next-font-manager'
+import { FontProvider } from 'fontline'
 import { fontConfig } from './fonts'
 
 export default function RootLayout({
@@ -97,7 +97,7 @@ export default function RootLayout({
 
 ```typescript
 // components/font-selector.tsx
-import { useFont } from 'next-font-manager'
+import { useFont } from 'fontline'
 
 export function FontSelector() {
   const { font, setFont, fonts } = useFont()
